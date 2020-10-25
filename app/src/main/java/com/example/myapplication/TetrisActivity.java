@@ -76,7 +76,6 @@ public class TetrisActivity extends AppCompatActivity {
         int line;
         int speed = 1;
 
-
         public FieldView(Context context) {
             super(context);
 
@@ -148,6 +147,7 @@ public class TetrisActivity extends AppCompatActivity {
                 GameOver();
             }
 
+            //ブロックが積み重なるようにする(ブロック)
             for (int y = 0; y < block.length; y ++) {
                 for (int x = 0; x < block[y].length; x ++) {
                     if (block[y][x] != 0 && map[y + offsety][x + offsetx] != 0) {
@@ -168,18 +168,17 @@ public class TetrisActivity extends AppCompatActivity {
             }
         }
 
-        //次に落下するブロックを指定位置に表示
-      /*  void mergeMatrix1(int[][] block, int offsetx, int offsety){
-            for (int y = 0; y < next.length; y++) {
-                for (int x = 0; x < next[0].length; x++) {
-                    if (block[y][x] != 0) {
-                        next = block;
-                    }
-                }
-            }
+//        //次に落下するブロックを指定位置に表示
+//        void mergeMatrix1(int[][] block, int offsetx, int offsety){
+//            for (int y = 0; y < next.length; y++) {
+//                for (int x = 0; x < next[0].length; x++) {
+//                    if (block[y][x] != 0) {
+//                        next = block;
+//                    }
+//                }
+//            }
+//        }
 
-        }
-*/
 
         // 列がそろったら消す
         void clearRows() {
@@ -194,7 +193,6 @@ public class TetrisActivity extends AppCompatActivity {
                         break;
                     }
                 }
-
                 if (full) {
                     map[y] = null;
                 }
@@ -246,18 +244,16 @@ public class TetrisActivity extends AppCompatActivity {
         @Override
         protected void onDraw(Canvas canvas) {
             ShapeDrawable rect = new ShapeDrawable(new RectShape());
-            // rect.setBounds(0, 0, 1080, 1731);
-           /* rect.setBounds(0,0,1080,1731);
+            rect.setBounds(0, 0, 1080, 1731);
+            rect.setBounds(0,0,1080,1731);
             rect.getPaint().setColor(0xFFFFFFFF);
             rect.draw(canvas);
             canvas.translate(0, 0);
-            */
 
             ShapeDrawable nextBlockView = new ShapeDrawable(new RectShape());
             nextBlockView.setBounds(750, 50, 1030, 850);
             nextBlockView.getPaint().setColor(0xFF696969);
             nextBlockView.draw(canvas);
-
 
             Paint paint = new Paint();
             rect.setBounds(0, 0, 700, 1731);
@@ -348,7 +344,6 @@ public class TetrisActivity extends AppCompatActivity {
                     FlickCheck();
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    break;
                 case MotionEvent.ACTION_CANCEL:
                     break;
             }
@@ -434,10 +429,11 @@ public class TetrisActivity extends AppCompatActivity {
                                 posx = 4;
                                 posy = 0;
                                 block = blocks[mRand.nextInt(blocks.length)];
-                              /*  block = block1;
-                                block1 = blocks[mRand.nextInt(blocks.length)];
-                                mergeMatrix1(block1, 0, 0);
-                               */
+
+//                                block = block1;
+//                                block1 = blocks[mRand.nextInt(blocks.length)];
+//                                mergeMatrix(block1, 0, 0);
+
                             }
 
                             invalidate();
@@ -462,9 +458,8 @@ public class TetrisActivity extends AppCompatActivity {
     }
 
     private BGMPlayer bgm;
-    FieldView mFieldView;
-
-    Boolean isChecked;
+    private FieldView mFieldView;
+    private Boolean Switch;
 
     private void setFieldView() {
         if (mFieldView == null) {
@@ -483,15 +478,16 @@ public class TetrisActivity extends AppCompatActivity {
         super.onResume();
         setFieldView();
 
-        //  SharedPreferences Count = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences Count = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
-        Boolean Switch = Count.getBoolean("Switch",true);
+        Switch = Count.getBoolean("Switch",true);
 
-        if(Switch == true) {
+        //BGMの有無を判定
+        if(Switch) {
             bgm.start();
-        }else if(Switch == false){
-            bgm = null;
+        }else{
+            bgm.stop();
         }
+
         mFieldView.initGame();
         mFieldView.startAnime();
         Looper.myQueue().addIdleHandler(new Idler());
